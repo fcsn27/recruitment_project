@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Quản lý yêu cầu tuyển dụng</h2>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Tiêu đề</th>
+                        <th>Phòng ban</th>
+                        <th>Số lượng</th>
+                        <th>Lý do</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in job_requests %}
+                    <tr>
+                        <td>{{ job.title }}</td>
+                        <td>{{ job.department }}</td>
+                        <td>{{ job.quantity }}</td>
+                        <td>{{ job.reason|default:"Không có lý do" }}</td>
+                        <td>{{ job.rejection_reason|default:"Chưa từ chối" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">Không có yêu cầu nào.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mt-3 text-center mb-5">
+        <a href="{% url 'jobs:create_job_request' %}" class="btn btn-primary">Tạo yêu cầu mới</a>
+        <a href="{% url 'hr:recruitment_analytics' %}" class="btn btn-secondary">Xem phân tích</a>
+    </div>
+</div>
+{% endblock %}

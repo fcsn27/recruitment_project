@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Schedule Interview{% endblock %}
+{% block content %}
+<h2>Schedule Interview for {{ application.job.title }}</h2>
+<div class="card p-4">
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button button_type="submit" content="Schedule" button_class="btn-primary" %}
+        <a href="{% url 'hr:manage_applications' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

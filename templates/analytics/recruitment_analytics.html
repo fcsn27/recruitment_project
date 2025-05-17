@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Phân tích tuyển dụng</h2>
+    <div class="row">
+        <!-- Biểu đồ trạng thái ứng tuyển -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Trạng thái ứng tuyển</h5>
+                    <canvas id="statusChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Biểu đồ phòng ban -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Yêu cầu theo phòng ban</h5>
+                    <canvas id="departmentChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mb-5">
+        <a href="{% url 'jobs:manage_job_requests' %}" class="btn btn-primary">Quay lại quản lý yêu cầu</a>
+    </div>
+</div>
+
+<!-- Tải Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Dữ liệu từ view
+    const statusData = {
+        labels: {{ status_data.labels|safe }},
+        datasets: [{
+            label: 'Số lượng ứng tuyển',
+            data: {{ status_data.counts|safe }},
+            backgroundColor: ['#007BFF', '#A61C00', '#E0A800'],
+            borderColor: ['#0056b3', '#7b1500', '#b38800'],
+            borderWidth: 1
+        }]
+    };
+
+    const departmentData = {
+        labels: {{ department_data.labels|safe }},
+        datasets: [{
+            label: 'Số yêu cầu',
+            data: {{ department_data.counts|safe }},
+            backgroundColor: ['#007BFF', '#A61C00', '#E0A800', '#2E7D32'],
+            borderColor: ['#0056b3', '#7b1500', '#b38800', '#1b5e20'],
+            borderWidth: 1
+        }]
+    };
+
+    // Vẽ biểu đồ cột cho trạng thái
+    new Chart(document.getElementById('statusChart'), {
+        type: 'bar',
+        data: statusData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Số lượng' } }
+            }
+        }
+    });
+
+    // Vẽ biểu đồ tròn cho phòng ban
+    new Chart(document.getElementById('departmentChart'), {
+        type: 'pie',
+        data: departmentData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { enabled: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

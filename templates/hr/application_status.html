@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Quản lý hồ sơ{% endblock %}
+{% block content %}
+<h2>Hồ sơ ứng tuyển</h2>
+<div class="card p-4">
+    {% if applications %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Job Title</th>
+                <th>Applicant</th>
+                <th>Status</th>
+                <th>Submitted At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.job.title }}</td>
+                <td>{{ application.applicant.email }}</td>
+                <td>{{ application.status }}</td>
+                <td>{{ application.submitted_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No applications found.</p>
+    {% endif %}
+</div>
+{% endblock %}

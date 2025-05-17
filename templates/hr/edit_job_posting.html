@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Edit Job Posting{% endblock %}
+{% block content %}
+<h2>Edit Job Posting: {{ job_posting.title }}</h2>
+<div class="card p-4">
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button button_type="submit" content="Update" button_class="btn-primary" %}
+        <a href="{% url 'hr:manage_job_postings' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

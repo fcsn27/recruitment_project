@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Về chúng tôi</h2>
+    <div class="card">
+        <div class="card-body">
+            {% if company_info.logo %}
+                <img src="{{ company_info.logo.url }}" alt="{{ company_info.name }} Logo" class="company-logo mb-3">
+            {% endif %}
+            <h3 class="card-title">{{ company_info.name }}</h3>
+            <p class="card-text">{{ company_info.description }}</p>
+            <p class="card-text"><strong>Địa chỉ:</strong> {{ company_info.address }}</p>
+            <p class="card-text"><strong>Website:</strong> <a href="{{ company_info.website }}" target="_blank">{{ company_info.website }}</a></p>
+            {% if company_info.email %}
+                <p class="card-text"><strong>Email:</strong> <a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a></p>
+            {% endif %}
+            {% if company_info.phone %}
+                <p class="card-text"><strong>Số điện thoại:</strong> {{ company_info.phone }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="text-center mt-3 mb-5">
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">Xem tin tuyển dụng</a>
+    </div>
+</div>
+{% endblock %}

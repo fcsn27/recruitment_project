@@ -1,0 +1,118 @@
+{% load django_bootstrap5 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hệ thống tuyển dụng{% endblock %}</title>
+    {% bootstrap_css %}
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'jobs:job_list' %}">PH2N</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'hr' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:manage_job_postings' %}">Quản lý tin tuyển dụng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:manage_applications' %}">Quản lý ứng tuyển</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:manage_interviews' %}">Quản lý phỏng vấn</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:application_status' %}">Trạng thái ứng tuyển</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:manage_company_info' %}">Thông tin công ty</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:recruitment_analytics' %}">Phân tích</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:recruitment_history' %}">Lịch sử</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:user_management' %}">Quản lý người dùng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                            </li>
+                        {% elif user.role == 'department' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'jobs:create_job_request' %}">Tạo yêu cầu tuyển dụng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'jobs:manage_job_requests' %}">Yêu cầu tuyển dụng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:application_status' %}">Trạng thái ứng tuyển</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:manage_interviews' %}">Quản lý phỏng vấn</a>
+                            </li>
+                        {% elif user.role == 'director' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'jobs:manage_job_requests' %}">Yêu cầu tuyển dụng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:recruitment_analytics' %}">Phân tích</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:recruitment_history' %}">Lịch sử</a>
+                            </li>
+                        {% elif user.role == 'applicant' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'jobs:job_list' %}">Tin tuyển dụng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'jobs:application_status' %}">Trạng thái ứng tuyển</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr:company_info' %}">Về chúng tôi</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:logout' %}">Đăng xuất</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">Đăng nhập</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:register' %}">Đăng ký</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="content-wrapper">
+        <div class="container mt-4">
+            {% bootstrap_messages %}
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container">
+            <p><strong>PH2N</strong> © 2025. All rights reserved.</p>
+        </div>
+    </footer>
+    {% bootstrap_javascript %}
+</body>
+</html>

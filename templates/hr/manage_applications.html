@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Manage Applications{% endblock %}
+{% block content %}
+<h2>Manage Applications</h2>
+<div class="card p-4">
+    {% if applications %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Job</th>
+                <th>Status</th>
+                <th>Applied At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.user.full_name }}</td>
+                <td>{{ application.job.title }}</td>
+                <td>{{ application.status }}</td>
+                <td>{{ application.applied_at }}</td>
+                <td>
+                    <a href="{% url 'hr:update_application_status' application.id %}" class="btn btn-primary btn-sm">Update Status</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No applications available.</p>
+    {% endif %}
+</div>
+{% endblock %}

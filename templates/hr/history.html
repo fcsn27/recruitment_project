@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Application History{% endblock %}
+{% block content %}
+<h2>Application History</h2>
+<div class="card p-4">
+    {% if applications %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Job</th>
+                <th>Status</th>
+                <th>Applied At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.user.full_name }}</td>
+                <td>{{ application.job.title }}</td>
+                <td>{{ application.status }}</td>
+                <td>{{ application.applied_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No application history available.</p>
+    {% endif %}
+</div>
+{% endblock %}
