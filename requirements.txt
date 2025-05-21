@@ -86,6 +86,7 @@ dask-expr @ file:///C:/b/abs_d8e1rqubql/croot/dask-expr_1725523012670/work
 datashader @ file:///C:/b/abs_37m05texdf/croot/datashader_1720534925330/work
 debugpy @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/debugpy_1699554994633/work
 decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
+decouple==0.0.7
 defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
 diff-match-patch @ file:///Users/ktietz/demo/mc3/conda-bld/diff-match-patch_1630511840874/work
 dill @ file:///C:/b/abs_f79eg27d2q/croot/dill_1715094735295/work
@@ -93,6 +94,7 @@ distlib==0.3.9
 distributed @ file:///C:/b/abs_52ju83vjqr/croot/distributed_1725523030746/work
 distro @ file:///C:/b/abs_71xr36ua5r/croot/distro_1714488282676/work
 Django==5.2.1
+django-allauth==65.8.0
 django-bootstrap5==25.1
 django-filter==25.1
 docstring-to-markdown @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/docstring-to-markdown_1699484265167/work
@@ -366,7 +368,7 @@ stack-data @ file:///opt/conda/conda-bld/stack_data_1646927590127/work
 starlette==0.46.1
 statsmodels @ file:///C:/b/abs_54b33xdukx/croot/statsmodels_1718381209933/work
 streamlit @ file:///C:/b/abs_84p_54gim8/croot/streamlit_1724335176234/work
-sympy==1.13.1
+sympy==1.14.0
 tables @ file:///C:/b/abs_92un5wtnqq/croot/pytables_1725380800658/work
 tabulate @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/tabulate_1701812852133/work
 tblib @ file:///Users/ktietz/demo/mc3/conda-bld/tblib_1629402031467/work
@@ -384,6 +386,7 @@ toml @ file:///tmp/build/80754af9/toml_1616166611790/work
 tomli @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/tomli_1699472528897/work
 tomlkit==0.13.2
 toolz @ file:///C:/Users/dev-admin/perseverance-python-buildout/croot/toolz_1699474617784/work
+torch==2.7.0
 torchtext==0.18.0
 tornado @ file:///C:/b/abs_7bua0304mj/croot/tornado_1718740122405/work
 tqdm @ file:///C:/b/abs_77wju137gk/croot/tqdm_1724853945787/work
