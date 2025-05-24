@@ -1,20 +1,18 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
-{% block title %}Update Application Status{% endblock %}
+{% block title %}Cập nhật thông tin trạng thái{% endblock %}
 {% block content %}
 <h2>Update Application Status</h2>
 <div class="card p-4">
     <form method="post">
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select name="status" id="status" class="form-select">
-                <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending</option>
-                <option value="accepted" {% if application.status == 'accepted' %}selected{% endif %}>Accepted</option>
-                <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
-            </select>
-        </div>
-        {% bootstrap_button button_type="submit" content="Update Status" %}
+        <label for="status">Trạng thái</label>
+        <select name="status" id="status">
+            <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Chờ duyệt</option>
+            <option value="approved" {% if application.status == 'approved' %}selected{% endif %}>Duyệt</option>
+            <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Từ chối</option>
+        </select>
+        <button type="submit">Cập nhật</button>
     </form>
 </div>
 {% endblock %}

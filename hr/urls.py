@@ -17,4 +17,6 @@ urlpatterns = [
     path('application-status/', views.application_status, name='application_status'),
     path('applications/<int:application_id>/schedule-interview/', views.schedule_interview, name='schedule_interview'),
     path('interviews/', views.manage_interviews, name='manage_interviews'),
+    path('requests/history/', views.recruitment_requests_history, name='recruitment_requests_history'),
+    path('applications/<int:application_id>/update-status-inline/', views.update_application_status_inline, name='update_application_status_inline'),
 ]

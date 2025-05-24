@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
-{% block title %}Schedule Interview{% endblock %}
+{% block title %}Quản lý phỏng vấn{% endblock %}
 {% block content %}
-<h2>Schedule Interview for {{ application.job.title }}</h2>
+<h2>Lịch phỏng vấn cho {{ application.job.title }}</h2>
 <div class="card p-4">
     <form method="post">
         {% csrf_token %}

@@ -11,6 +11,14 @@
     <p><strong>Created At:</strong> {{ job_request.created_at|date:"Y-m-d H:i" }}</p>
     <p><strong>Status:</strong> {{ job_request.get_status_display }}</p>
     <p><strong>Rejection Reason:</strong> {{ job_request.rejection_reason|default:"N/A" }}</p>
-    <a href="{% url 'jobs:manage_job_requests' %}" class="btn btn-secondary">Back to Job Requests</a>
+
+    <div class="mt-4">
+        <a href="{% url 'jobs:manage_job_requests' %}" class="btn btn-secondary">Back to Job Requests</a>
+
+        {% if user.role == 'director' and job_request.status == 'pending' %}
+            <a href="{% url 'jobs:approve_job_request' job_request.id %}" class="btn btn-success ms-2">Duyệt yêu cầu</a>
+            <a href="{% url 'jobs:reject_job_request' job_request.id %}" class="btn btn-danger ms-2">Từ chối yêu cầu</a>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

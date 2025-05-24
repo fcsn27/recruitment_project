@@ -4,11 +4,24 @@
 {% block content %}
 <h2>Edit Job Request: {{ job_request.title }}</h2>
 <div class="card p-4">
-    <form method="post">
+    <form method="post" novalidate>
         {% csrf_token %}
         {% bootstrap_form form %}
         {% bootstrap_button button_type="submit" content="Save Changes" %}
         <a href="{% url 'jobs:manage_job_requests' %}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+<script>
+    (function () {
+        'use strict';
+        var form = document.querySelector('form');
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    })();
+</script>
 {% endblock %}

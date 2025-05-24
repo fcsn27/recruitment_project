@@ -1,36 +1,58 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
-{% block title %}Manage Applications{% endblock %}
+{% block title %}Quản lý hồ sơ{% endblock %}
 {% block content %}
-<h2>Manage Applications</h2>
+<h2>Quản lý hồ sơ</h2>
 <div class="card p-4">
-    {% if applications %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Applicant</th>
-                <th>Job</th>
-                <th>Status</th>
-                <th>Applied At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for application in applications %}
-            <tr>
-                <td>{{ application.user.full_name }}</td>
-                <td>{{ application.job.title }}</td>
-                <td>{{ application.status }}</td>
-                <td>{{ application.applied_at }}</td>
-                <td>
-                    <a href="{% url 'hr:update_application_status' application.id %}" class="btn btn-primary btn-sm">Update Status</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No applications available.</p>
-    {% endif %}
+  <h2>Danh sách đơn ứng tuyển</h2>
+  {% if applications %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Vị trí tuyển dụng</th>
+        <th>Ứng viên</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for application in applications %}
+      <tr>
+        <td>{{ application.job.title }}</td>
+        <td>{{ application.user.full_name }}</td>
+        <td>
+          {% if application.status == 'pending' %}
+          <form method="post" action="{% url 'hr:update_application_status_inline' application.id %}">
+            {% csrf_token %}
+            <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
+              <option value="pending" selected>Chờ duyệt</option>
+              <option value="approved">Duyệt (Chuẩn bị phỏng vấn)</option>
+              <option value="rejected">Từ chối</option>
+            </select>
+          </form>
+          {% elif application.status == 'approved' %}
+            <span class="badge bg-info">Đã duyệt - Chuẩn bị phỏng vấn</span>
+          {% elif application.status == 'passed' %}
+            <span class="badge bg-success">Đạt tuyển</span>
+          {% elif application.status == 'rejected' %}
+            <span class="badge bg-danger">Từ chối</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if application.status == 'pending' %}
+            <span class="text-muted">Chờ xét duyệt</span>
+          {% elif application.status == 'approved' %}
+            <a href="{% url 'hr:schedule_interview' application.id %}" class="btn btn-primary btn-sm">Quản lý phỏng vấn</a>
+          {% else %}
+            <span class="text-secondary">Không thể thay đổi</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Hiện chưa có đơn ứng tuyển nào.</p>
+  {% endif %}
 </div>
 {% endblock %}

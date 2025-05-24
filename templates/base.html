@@ -25,7 +25,7 @@
                                 <a class="nav-link" href="{% url 'hr:manage_job_postings' %}">Quản lý tin tuyển dụng</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'hr:manage_applications' %}">Quản lý ứng tuyển</a>
+                                <a class="nav-link" href="{% url 'hr:manage_applications' %}">Quản lý ứng viên</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'hr:manage_interviews' %}">Quản lý phỏng vấn</a>
@@ -39,15 +39,15 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'hr:recruitment_analytics' %}">Phân tích</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'hr:recruitment_history' %}">Lịch sử</a>
-                            </li>
+                            <!-- <li class="nav-item">
+                                <a class="nav-link" href="{% url 'hr:recruitment_requests_history' %}">Lịch sử</a>
+                            </li> -->
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'accounts:user_management' %}">Quản lý người dùng</a>
                             </li>
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                            </li>
+                            </li> -->
                         {% elif user.role == 'department' %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'jobs:create_job_request' %}">Tạo yêu cầu tuyển dụng</a>
@@ -63,13 +63,13 @@
                             </li>
                         {% elif user.role == 'director' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'jobs:manage_job_requests' %}">Yêu cầu tuyển dụng</a>
+                                <a class="nav-link" href="{% url 'jobs:manage_job_requests' %}">Quản lý yêu cầu</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'hr:recruitment_analytics' %}">Phân tích</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'hr:recruitment_history' %}">Lịch sử</a>
+                                <a class="nav-link" href="{% url 'hr:recruitment_requests_history' %}">Lịch sử tuyển dụng</a>
                             </li>
                         {% elif user.role == 'applicant' %}
                             <li class="nav-item">

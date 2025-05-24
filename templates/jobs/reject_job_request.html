@@ -6,15 +6,29 @@
 <div class="card p-4">
     <p><strong>Department:</strong> {{ job_request.department }}</p>
     <p><strong>Description:</strong> {{ job_request.description }}</p>
-    <form method="post">
+    <form method="post" novalidate>
         {% csrf_token %}
-        <p>Are you sure you want to reject this job request?</p>
+        <p>Bạn có chắc sẽ từ chối đề xuất tuyển dụng này không?</p>
         <div class="mb-3">
-            <label for="rejection_reason" class="form-label">Reason for rejection (required):</label>
-            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" required></textarea>
+            <label for="rejection_reason" class="form-label">Lý do:</label>
+            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" required>{{ request.POST.rejection_reason }}</textarea>
+            <div class="invalid-feedback">Vui lòng cung cấp lý do.</div>
         </div>
-        {% bootstrap_button button_type="submit" content="Reject" button_class="btn-danger" %}
-        <a href="{% url 'jobs:manage_job_requests' %}" class="btn btn-secondary">Cancel</a>
+        {% bootstrap_button button_type="submit" content="Từ chối" button_class="btn-danger" %}
+        <a href="{% url 'jobs:manage_job_requests' %}" class="btn btn-secondary">Huỷ</a>
     </form>
 </div>
+<script>
+    (function () {
+        'use strict';
+        var form = document.querySelector('form');
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    })();
+</script>
 {% endblock %}

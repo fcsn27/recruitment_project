@@ -9,10 +9,13 @@
                 <thead>
                     <tr>
                         <th>Tiêu đề</th>
-                        <th>Phòng ban</th>
-                        <th>Số lượng</th>
+                        <th>Phòng</th>
+                        <th>SL</th>
                         <th>Lý do</th>
                         <th>Trạng thái</th>
+                        {% if user.role == 'director' or user.role == 'department' %}
+                        <th>Hành động</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -21,19 +24,52 @@
                         <td>{{ job.title }}</td>
                         <td>{{ job.department }}</td>
                         <td>{{ job.quantity }}</td>
-                        <td>{{ job.reason|default:"Không có lý do" }}</td>
-                        <td>{{ job.rejection_reason|default:"Chưa từ chối" }}</td>
+                        <td>{{ job.reason|default:"Trống" }}</td>
+                        <td>
+                            {% if job.status == 'pending' %}
+                                Chờ duyệt
+                            {% elif job.status == 'approved' %}
+                                Đã duyệt
+                            {% elif job.status == 'rejected' %}
+                                Từ chối
+                            {% else %}
+                                {{ job.get_status_display }}
+                            {% endif %}
+                        </td>
+                        {% if user.role == 'director' or user.role == 'department' %}
+                        <td>
+                            {% if job.status == 'pending' and user.role == 'director' %}
+                                <a href="{% url 'jobs:approve_job_request' job.id %}" class="btn btn-success btn-sm">Duyệt</a>
+                                <a href="{% url 'jobs:reject_job_request' job.id %}" class="btn btn-danger btn-sm">Từ chối</a>
+                            {% elif job.status == 'approved' %}
+                                <small class="text-success">
+                                    Đã duyệt.
+                                </small>
+                            {% elif job.status == 'rejected' %}
+                                <small class="text-danger">
+                                    Lý do từ chối: {{ job.rejection_reason|default:"(Chưa có lý do từ chối)." }}
+                                </small>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% endif %}
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5">Không có yêu cầu nào.</td></tr>
+                    <tr>
+                        <td colspan="{% if user.role == 'director' or user.role == 'department' %}6{% else %}5{% endif %}">
+                            Không có yêu cầu nào.
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
     <div class="mt-3 text-center mb-5">
-        <a href="{% url 'jobs:create_job_request' %}" class="btn btn-primary">Tạo yêu cầu mới</a>
-        <a href="{% url 'hr:recruitment_analytics' %}" class="btn btn-secondary">Xem phân tích</a>
+        {% if user.role == 'department' %}
+            <a href="{% url 'jobs:create_job_request' %}" class="btn btn-primary">Tạo yêu cầu mới</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

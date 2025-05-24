@@ -38,7 +38,10 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             try:
-                user = form.save()
+                # user = form.save()
+                user = form.save(commit=False)
+                user.role = 'applicant'  # Gán vai trò ứng viên
+                user.save()
                 messages.success(request, f'Tài khoản {user.email} đã được tạo thành công.')
                 return redirect('accounts:login')
             except IntegrityError:

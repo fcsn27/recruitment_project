@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<h2>Lịch sử yêu cầu tuyển dụng</h2>
+<div class="card p-4">
+    {% if job_requests %}
+    <table class="table" style="border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="border: none;">Tiêu đề</th>
+                <th style="border: none;">Phòng</th>
+                <th style="border: none;">SL</th>
+                <th style="border: none;">Lý do</th>
+                <th style="border: none;">Trạng thái</th>
+                <th style="border: none;">Lý do</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in job_requests %}
+            <tr>
+                <td style="border: none;">{{ req.title }}</td>
+                <td style="border: none;">{{ req.department }}</td>
+                <td style="border: none;">{{ req.quantity }}</td>
+                <td style="border: none;">{{ req.reason|default:"-" }}</td>
+                <td style="border: none;">{{ req.status|capfirst }}</td>
+                <td style="border: none;">
+                    {% if req.status == "rejected" %}
+                        {{ req.rejection_reason|default:"Không hợp lệ" }}
+                    {% elif req.status == "approved" %}
+                        {{ req.approval_reason|default:"Hợp lệ" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Không có yêu cầu tuyển dụng nào.</p>
+    {% endif %}
+</div>
+{% endblock %}

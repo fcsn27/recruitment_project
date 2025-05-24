@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Ứng tuyển vị trí: <strong>{{ job.title }}</strong></h2>
+    <div class="card p-4">
+        <p><em>Mô tả: {{ job.description|linebreaks }}</em></p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary mt-3">Nộp đơn</button>
+            <a href="{% url 'jobs:job_list' %}" class="btn btn-secondary mt-3 ms-2">Quay lại</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

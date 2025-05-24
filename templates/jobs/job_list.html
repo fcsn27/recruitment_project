@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 {% block content %}
-<div class="container mt-5">
+<!-- <div class="container mt-5"> -->
     <!-- Thông tin doanh nghiệp -->
-    <div class="card mb-4">
+    <!-- <div class="card mb-4">
         <div class="card-body">
             {% if company_info.logo %}
                 <img src="{{ company_info.logo.url }}" alt="{{ company_info.name }} Logo" class="company-logo mb-3">
@@ -19,20 +19,23 @@
                 <p class="card-text"><strong>Số điện thoại:</strong> {{ company_info.phone }}</p>
             {% endif %}
         </div>
+    </div> -->
+<!-- </div> -->
+<!-- Danh sách tin tuyển dụng -->
+<h2>Tin tuyển dụng</h2>
+{% for job in jobs %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">{{ job.title }}</h5>
+        <p class="card-text">{{ job.description|truncatewords:30 }}</p>
+        <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-primary">Xem chi tiết</a>
     </div>
-    <!-- Danh sách tin tuyển dụng -->
-    <h2 class="mb-4">Tin tuyển dụng</h2>
-    {% for job in jobs %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5 class="card-title">{{ job.title }}</h5>
-            <p class="card-text">{{ job.description|truncatewords:30 }}</p>
-            <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-primary">Xem chi tiết</a>
-        </div>
-    </div>
-    {% empty %}
-    <p>Không có tin tuyển dụng nào.</p>
-    {% endfor %}
-    <div class="mb-5"></div>
 </div>
+{% empty %}
+<div class="card p-4">
+    <p>Không có tin tuyển dụng nào.</p>
+</div>
+{% endfor %}
+<div class="mb-5"></div>
+
 {% endblock %}

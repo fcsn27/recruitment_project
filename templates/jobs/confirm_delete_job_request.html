@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Xác nhận xoá yêu cầu tuyển dụng{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Xác nhận xoá yêu cầu: {{ job_request.title }}</h2>
+    <p>Bạn có chắc chắn muốn xoá yêu cầu này không? Hành động này không thể hoàn tác.</p>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Xoá</button>
+        <a href="{% url 'jobs:manage_job_requests' %}" class="btn btn-secondary">Huỷ</a>
+    </form>
+</div>
+{% endblock %}

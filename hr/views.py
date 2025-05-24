@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from jobs.models import JobPosting, Application, ActionLog, JobRequest
 from .models import CompanyInfo, InterviewSchedule
@@ -63,36 +64,60 @@ def delete_job_posting(request, job_id):
     return redirect('hr:manage_job_postings')
 
 @login_required
+@login_required
 def manage_applications(request):
     if request.user.role != 'hr':
-        messages.error(request, 'Only HR can manage applications.')
+        messages.error(request, 'Chỉ bộ phận nhân sự mới được phép quản lý đơn ứng tuyển.')
         return redirect('jobs:job_list')
+    
     applications = Application.objects.all()
     return render(request, 'hr/manage_applications.html', {'applications': applications})
 
 @login_required
 def update_application_status(request, application_id):
     if request.user.role != 'hr':
-        messages.error(request, 'Only HR can update application status.')
-        return redirect('jobs:job_list')
+        messages.error(request, 'Chỉ bộ phận nhân sự mới được cập nhật trạng thái đơn ứng tuyển.')
+        return redirect('hr:application_status')
+
     application = get_object_or_404(Application, id=application_id)
+
     if request.method == 'POST':
-        status = request.POST.get('status')
-        if status in ['pending', 'approved', 'rejected']:
-            application.status = status
-            application.save()
-            ActionLog.objects.create(
-                user=request.user,
-                action='update_application_status',
-                job_request=None,
-                details=f'Updated application {application.id} status to {status}',
-                timestamp=timezone.now()
-            )
-            messages.success(request, f'Application status updated to {status}.')
-        else:
-            messages.error(request, 'Invalid status.')
-        return redirect('hr:manage_applications')
-    return render(request, 'hr/update_application_status.html', {'application': application})
+        new_status = request.POST.get('status')
+
+        allowed_transitions = {
+            'approved': ['passed', 'rejected'],
+            # Có thể mở rộng thêm trạng thái khác nếu cần
+        }
+
+        current_status = application.status
+
+        # Chỉ cho phép thay đổi trạng thái theo quy tắc
+        if current_status not in allowed_transitions or new_status not in allowed_transitions.get(current_status, []):
+            messages.error(request, 'Trạng thái không hợp lệ hoặc không được phép thay đổi.')
+            return redirect('hr:application_status')
+
+        if new_status == 'rejected':
+            application.delete()
+            messages.success(request, 'Đơn ứng tuyển đã bị từ chối và xóa khỏi hệ thống.')
+            return redirect('hr:application_status')
+
+        application.status = new_status
+        application.save()
+
+        ActionLog.objects.create(
+            user=request.user,
+            action_type='update_application_status',
+            job_request=None,
+            details=f'Cập nhật trạng thái đơn {application.id} từ {current_status} sang {new_status}',
+            timestamp=timezone.now()
+        )
+
+        messages.success(request, f'Đơn ứng tuyển đã được cập nhật trạng thái: {new_status}.')
+
+        return redirect('hr:application_status')
+
+    return redirect('hr:application_status')
+
 
 @login_required
 def recruitment_history(request):
@@ -122,31 +147,46 @@ def manage_company_info(request):
 
 @login_required
 def application_status(request):
-    if request.user.role not in ['hr', 'department']:
-        messages.error(request, 'Only HR and departments can view application status.')
-        return redirect('jobs:job_list')
-    applications = Application.objects.filter(job__created_by=request.user)
+    user = request.user
+    if user.role == 'hr':
+        applications = Application.objects.all()
+    elif user.role == 'department':
+        applications = Application.objects.filter(job__department=user.department)
+    else:  # ứng viên
+        applications = Application.objects.filter(user=user)
     return render(request, 'hr/application_status.html', {'applications': applications})
 
 @login_required
 def schedule_interview(request, application_id):
-    if request.user.role not in ['hr', 'department']:
-        messages.error(request, 'Only HR and departments can schedule interviews.')
+    user = request.user
+
+    # Kiểm tra role: chỉ HR hoặc department mới được lên lịch
+    if user.role not in ['hr', 'department']:
+        messages.error(request, 'Chỉ bộ phận nhân sự và trưởng phòng ban mới được lên lịch phỏng vấn.')
         return redirect('jobs:job_list')
+
     application = get_object_or_404(Application, id=application_id)
-    if application.job.created_by != request.user and request.user.role != 'hr':
-        messages.error(request, 'You can only schedule interviews for your own job postings.')
-        return redirect('hr:manage_applications')
+    job = application.job
+
+    # Nếu là trưởng phòng ban, kiểm tra vị trí tuyển dụng thuộc phòng của họ
+    if user.role == 'department':
+        if job.department != user.department:
+            messages.error(request, 'Bạn chỉ được lên lịch phỏng vấn cho các vị trí thuộc phòng ban của bạn.')
+            return redirect('hr:manage_applications')
+
+    # Xử lý form lên lịch phỏng vấn
     if request.method == 'POST':
         form = InterviewScheduleForm(request.POST)
         if form.is_valid():
             interview = form.save(commit=False)
-            interview.created_by = request.user
+            interview.created_by = user
+            interview.application = application  # gán liên kết ứng dụng
             interview.save()
-            messages.success(request, 'Interview scheduled successfully.')
+            messages.success(request, 'Lịch phỏng vấn đã được tạo thành công.')
             return redirect('hr:manage_applications')
     else:
         form = InterviewScheduleForm(initial={'application': application})
+
     return render(request, 'hr/schedule_interview.html', {'form': form, 'application': application})
 
 @login_required
@@ -181,3 +221,69 @@ def recruitment_analytics(request):
         'department_data': department_data,
     }
     return render(request, 'analytics/recruitment_analytics.html', context)
+
+@login_required
+def recruitment_requests_history(request):
+    if request.user.role not in ['hr', 'director']:
+        messages.error(request, 'Bạn không có quyền xem lịch sử yêu cầu tuyển dụng.')
+        return redirect('jobs:job_list')
+    
+    job_requests = JobRequest.objects.all()
+    
+    department_filter = request.GET.get('department')
+    if department_filter:
+        job_requests = job_requests.filter(department=department_filter)
+    
+    job_requests = job_requests.order_by('-id')  # Hoặc theo ý bạn
+    
+    # Lấy danh sách phòng ban hiện có để hiển thị filter
+    departments = JobRequest.objects.values_list('department', flat=True).distinct()
+    
+    context = {
+        'job_requests': job_requests,
+        'departments': departments,
+        'selected_department': department_filter,
+    }
+    return render(request, 'hr/recruitment_requests_history.html', context)
+
+@login_required
+def update_application_status_inline(request, application_id):
+    if request.user.role != 'hr':
+        messages.error(request, 'Chỉ bộ phận nhân sự mới được cập nhật trạng thái đơn ứng tuyển.')
+        return redirect('hr:manage_applications')
+
+    application = get_object_or_404(Application, id=application_id)
+
+    if request.method == 'POST':
+        status = request.POST.get('status')
+
+        if application.status != 'pending':
+            messages.error(request, 'Chỉ có thể thay đổi trạng thái khi đơn đang ở trạng thái chờ duyệt.')
+            return redirect('hr:manage_applications')
+
+        if status not in ['approved', 'pending', 'rejected']:
+            messages.error(request, 'Trạng thái không hợp lệ.')
+            return redirect('hr:manage_applications')
+
+        if status == 'rejected':
+            application.delete()
+            messages.success(request, 'Đơn ứng tuyển đã bị từ chối và xóa khỏi hệ thống.')
+            return redirect('hr:manage_applications')
+
+        if status == 'approved':
+            application.status = status
+            application.save()
+            # Ghi log hành động
+            ActionLog.objects.create(
+                user=request.user,
+                action_type='update_application_status',
+                details=f"Trạng thái ứng tuyển đã được cập nhật thành {new_status}.",
+                timestamp=timezone.now()
+            )
+
+            messages.success(request, 'Đơn ứng tuyển đã được duyệt và chuyển sang quản lý phỏng vấn.')
+            return redirect('hr:schedule_interview', application_id=application.id)
+
+        return redirect('hr:manage_applications')
+
+    return redirect('hr:manage_applications')

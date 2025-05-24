@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
-{% block title %}Application History{% endblock %}
+{% block title %}Lịch sử yêu cầu{% endblock %}
 {% block content %}
-<h2>Application History</h2>
+<h2>Lịch sử yêu cầu</h2>
 <div class="card p-4">
     {% if applications %}
     <table class="table table-striped">
@@ -26,7 +26,7 @@
         </tbody>
     </table>
     {% else %}
-    <p>No application history available.</p>
+    <p>Chưa ghi nhận đề xuất nào.</p>
     {% endif %}
 </div>
 {% endblock %}

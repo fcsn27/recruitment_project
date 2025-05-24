@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Chi tiết công việc</h2>
+    <div class="card">
+        <div class="card-body">
+            <h4>{{ job.title }}</h4>
+            <p><strong>Phòng ban:</strong> {{ job.department }}</p>
+            <p><strong>Mô tả công việc:</strong></p>
+            <p>{{ job.description|linebreaks }}</p>
+            <p><strong>Trạng thái:</strong> 
+                {% if job.is_active %}
+                    <span class="badge bg-success">Hoạt động</span>
+                {% else %}
+                    <span class="badge bg-secondary">Ngưng hoạt động</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-secondary">Quay lại danh sách công việc</a>
+        {% if request.user.role == 'applicant' %}
+        <a href="{% url 'jobs:apply_job' job.id %}" class="btn btn-primary ms-2">Ứng tuyển ngay</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

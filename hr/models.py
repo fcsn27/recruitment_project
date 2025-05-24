@@ -30,3 +30,10 @@ class InterviewSchedule(models.Model):
 
     def __str__(self):
         return f"Interview for {self.application.job.title} at {self.scheduled_time}"
+
+class ActionLog(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='hr_action_logs')
+    action = models.CharField(max_length=100)
+    details = models.TextField()
+    job_request = models.ForeignKey('jobs.JobRequest', null=True, blank=True, on_delete=models.SET_NULL)
+    timestamp = models.DateTimeField(auto_now_add=True)

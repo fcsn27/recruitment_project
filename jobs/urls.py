@@ -13,4 +13,6 @@ urlpatterns = [
     path('job_requests/edit/<int:request_id>/', views.edit_job_request, name='edit_job_request'),
     path('job_requests/approve/<int:request_id>/', views.approve_job_request, name='approve_job_request'),
     path('job_requests/reject/<int:request_id>/', views.reject_job_request, name='reject_job_request'),
+    path('job_requests/delete/<int:request_id>/', views.delete_job_request, name='delete_job_request'),
+    path('<int:job_id>/', views.job_detail, name='job_detail'),
 ]

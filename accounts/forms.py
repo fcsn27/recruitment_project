@@ -5,10 +5,11 @@ from .models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['email', 'full_name', 'role', 'password1', 'password2']
-        widgets = {
-            'role': forms.Select(),
-        }
+        # fields = ['email', 'full_name', 'role', 'password1', 'password2']
+        # widgets = {
+        #     'role': forms.Select(),
+        # }
+        fields = ['email', 'full_name', 'password1', 'password2'] 
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
