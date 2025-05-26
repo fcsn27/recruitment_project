@@ -189,16 +189,31 @@ def schedule_interview(request, application_id):
 
     return render(request, 'hr/schedule_interview.html', {'form': form, 'application': application})
 
+# @login_required
+# def manage_interviews(request):
+#     if request.user.role not in ['hr', 'department']:
+#         messages.error(request, 'Only HR and departments can manage interviews.')
+#         return redirect('jobs:job_list')
+#     if request.user.role == 'hr':
+#         interviews = InterviewSchedule.objects.all()
+#     else:
+#         interviews = InterviewSchedule.objects.filter(created_by=request.user)
+#     return render(request, 'hr/manage_interviews.html', {'interviews': interviews})
 @login_required
 def manage_interviews(request):
     if request.user.role not in ['hr', 'department']:
         messages.error(request, 'Only HR and departments can manage interviews.')
         return redirect('jobs:job_list')
+
     if request.user.role == 'hr':
         interviews = InterviewSchedule.objects.all()
     else:
-        interviews = InterviewSchedule.objects.filter(created_by=request.user)
+        interviews = InterviewSchedule.objects.filter(
+            application__job__department=request.user.department
+        )
+
     return render(request, 'hr/manage_interviews.html', {'interviews': interviews})
+
 
 def company_info(request):
     company_info = CompanyInfo.objects.first()
