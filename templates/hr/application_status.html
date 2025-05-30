@@ -11,7 +11,10 @@
       <thead>
         <tr>
           <th>Vị trí</th>
-          <th>Ứng viên</th>
+          {% if user.role != 'applicant' %}
+            <th>Ứng viên</th>
+          {% endif %}
+          <th>CV</th>
           <th>Trạng thái</th>
           {% if user.role == 'hr' %}
             <th>Hành động</th>
@@ -22,7 +25,14 @@
         {% for app in applications %}
         <tr>
           <td>{{ app.job.title }}</td>
+          {% if user.role != 'applicant' %}
           <td>{{ app.user.full_name }}</td>
+          {% endif %}
+          <td>
+            {% if app.cv %}
+              <a href="{{ app.cv.url }}" target="_blank">Xem CV</a>
+            {% endif %}
+          </td>
           <td>
             {% if app.status == 'pending' %}
               <span class="badge bg-warning text-dark">Chờ duyệt</span>
