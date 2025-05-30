@@ -1,5 +1,7 @@
 from django import forms
+from django.contrib.auth.models import User
 from .models import CompanyInfo, InterviewSchedule
+
 
 class CompanyInfoForm(forms.ModelForm):
     class Meta:
@@ -24,10 +26,13 @@ class CompanyInfoForm(forms.ModelForm):
             'logo': 'Logo công ty',
         }
 
+
 class InterviewScheduleForm(forms.ModelForm):
     class Meta:
         model = InterviewSchedule
-        fields = ['application', 'interviewer', 'scheduled_time', 'location', 'notes']
-        widgets = {
-            'scheduled_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }
+        fields = ['interviewers', 'scheduled_time', 'location', 'notes']
+
+    def __init__(self, *args, interviewer_queryset=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if interviewer_queryset is not None:
+            self.fields['interviewer'].queryset = interviewer_queryset

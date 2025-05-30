@@ -8,11 +8,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Job Title</th>
-                <th>Applicant</th>
-                <th>Interviewer</th>
-                <th>Scheduled Time</th>
-                <th>Location</th>
+                <th>Vị trí</th>
+                <th>Ứng viên</th>
+                <th>Người phỏng vấn</th>
+                <th>Thời gian phỏng vấn</th>
             </tr>
         </thead>
         <tbody>
@@ -20,15 +19,14 @@
             <tr>
                 <td>{{ interview.application.job.title }}</td>
                 <td>{{ interview.application.applicant.email }}</td>
-                <td>{{ interview.interviewer.email|default:"N/A" }}</td>
+                <td>{{ interview.interviewer.email|default:"Chưa có người phỏng vấn" }}</td>
                 <td>{{ interview.scheduled_time }}</td>
-                <td>{{ interview.location }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <p>No interviews scheduled.</p>
+    <p>Chưa có lịch phỏng vấn nào.</p>
     {% endif %}
 </div>
 {% endblock %}

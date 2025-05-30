@@ -2,15 +2,15 @@
 {% load django_bootstrap5 %}
 {% block title %}Quản lý hồ sơ{% endblock %}
 {% block content %}
-<h2>Quản lý hồ sơ</h2>
+<h2>Quản lý hồ sơ ứng tuyển</h2>
 <div class="card p-4">
-  <h2>Danh sách đơn ứng tuyển</h2>
   {% if applications %}
-  <table class="table table-bordered">
+  <table class="table">
     <thead>
       <tr>
         <th>Vị trí tuyển dụng</th>
         <th>Ứng viên</th>
+        <th>CV</th>
         <th>Trạng thái</th>
         <th>Hành động</th>
       </tr>
@@ -20,6 +20,7 @@
       <tr>
         <td>{{ application.job.title }}</td>
         <td>{{ application.user.full_name }}</td>
+        <td><a href="{{ application.cv.url }}" target="_blank" class="btn btn-outline-dark btn-sm">Xem hồ sơ</a></td>
         <td>
           {% if application.status == 'pending' %}
           <form method="post" action="{% url 'hr:update_application_status_inline' application.id %}">
@@ -31,11 +32,11 @@
             </select>
           </form>
           {% elif application.status == 'approved' %}
-            <span class="badge bg-info">Đã duyệt - Chuẩn bị phỏng vấn</span>
+            <span class="badge text-bg-info">Đã duyệt - Chuẩn bị phỏng vấn</span>
           {% elif application.status == 'passed' %}
-            <span class="badge bg-success">Đạt tuyển</span>
+            <span class="badge text-bg-success">Đạt tuyển</span>
           {% elif application.status == 'rejected' %}
-            <span class="badge bg-danger">Từ chối</span>
+            <span class="badge text-bg-danger">Từ chối</span>
           {% endif %}
         </td>
         <td>
@@ -44,7 +45,7 @@
           {% elif application.status == 'approved' %}
             <a href="{% url 'hr:schedule_interview' application.id %}" class="btn btn-primary btn-sm">Quản lý phỏng vấn</a>
           {% else %}
-            <span class="text-secondary">Không thể thay đổi</span>
+            <span class="text-secondary">Đã ghi nhận</span>
           {% endif %}
         </td>
       </tr>

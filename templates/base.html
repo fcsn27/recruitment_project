@@ -80,9 +80,11 @@
                             </li>
                         {% endif %}
                     {% endif %}
+                    {% if user.role != 'hr' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'hr:company_info' %}">Về chúng tôi</a>
                     </li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
