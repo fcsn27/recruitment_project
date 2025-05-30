@@ -2,19 +2,15 @@
 {% load django_bootstrap5 %}
 {% block title %}Lên lịch phỏng vấn{% endblock %}
 {% block content %}
-<h2>Lên lịch phỏng vấn cho vị trí: {{ application.job.title }}</h2>
+<h2>Lên lịch phỏng vấn cho {{ application.job.title }}</h2>
 <div class="card p-4">
-    <p>Debug: Số lượng người phỏng vấn: {{ form.interviewer.queryset.count }}</p>
-    {% if form.interviewer.queryset %}
-        <form method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            {% bootstrap_button button_type="submit" content="Lên lịch" button_class="btn-primary" %}
-            <a href="{% url 'hr:manage_interviews' %}" class="btn btn-secondary">Hủy</a>
-        </form>
-    {% else %}
-        <p>Không có người phỏng vấn nào trong phòng ban này.</p>
-        <a href="{% url 'hr:manage_applications' %}" class="btn btn-secondary">Quay lại</a>
-    {% endif %}
+    <p><strong>Ứng viên:</strong> {{ application.user.full_name }} ({{ application.user.email }})</p>
+    <p><strong>Phòng ban:</strong> {{ application.job.department }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button "Lên lịch" button_type="submit" button_class="btn-primary" %}
+        <a href="{% url 'hr:manage_interviews' %}" class="btn btn-secondary">Hủy</a>
+    </form>
 </div>
 {% endblock %}

@@ -246,71 +246,76 @@ def application_status(request):
 
 @login_required
 def schedule_interview(request, application_id):
-    if request.user.role != 'hr':
-        messages.error(request, 'Chỉ bộ phận nhân sự mới được phép lên lịch phỏng vấn.')
-        return redirect('hr:manage_applications')
-
     application = get_object_or_404(Application, id=application_id)
-    job = application.job
-    department = job.department
-
-    print(f"Application ID: {application_id}")
-    print(f"Job department: {department}")
-
-    if not department:
-        messages.error(request, 'Vị trí tuyển dụng này chưa được gán phòng ban.')
-        return redirect('hr:manage_applications')
-
-    department_users = CustomUser.objects.filter(department=department, role__in=['hr', 'department'])
-    print(f"Users found: {department_users.count()}")
-    print(f"User emails: {list(department_users.values_list('email', flat=True))}")
-
-    if not department_users.exists():
-        messages.error(request, f'Không tìm thấy người phỏng vấn nào trong phòng ban "{department}".')
-        return redirect('hr:manage_applications')
-
+    
+    # Chỉ HR được phép lên lịch phỏng vấn
+    if request.user.role != 'hr':
+        messages.error(request, 'Chỉ HR có quyền lên lịch phỏng vấn.')
+        return redirect('hr:application_status')
+    
+    # Lấy danh sách người phỏng vấn
+    interviewers = CustomUser.objects.filter(
+        models.Q(department=application.job.department, is_interviewer=True) | 
+        models.Q(role='hr', is_interviewer=True)
+    )
+    if not interviewers.exists():
+        messages.error(request, f'Không tìm thấy người phỏng vấn nào trong phòng ban "{application.job.department}" hoặc team HR.')
+        return redirect('hr:application_status')
+    
     if request.method == 'POST':
-        form = InterviewScheduleForm(request.POST, interviewer_queryset=department_users)
+        form = InterviewScheduleForm(request.POST, department=application.job.department)
         if form.is_valid():
             interview = form.save(commit=False)
             interview.application = application
             interview.created_by = request.user
             interview.save()
-            messages.success(request, 'Lịch phỏng vấn đã được tạo thành công.')
+            # Lưu interviewers (ManyToMany)
+            interview.interviewers.set(form.cleaned_data['interviewers'])
+            application.status = 'scheduled'
+            application.save()
+            ActionLog.objects.create(
+                user=request.user,
+                action_type='schedule_interview',
+                job_request=application.job.created_by.jobrequest_set.first(),
+                details=f'Lên lịch phỏng vấn cho đơn {application.id} vào {interview.scheduled_time}',
+                timestamp=timezone.now()
+            )
+            messages.success(request, 'Lên lịch phỏng vấn thành công.')
             return redirect('hr:manage_interviews')
     else:
-        form = InterviewScheduleForm(interviewer_queryset=department_users, initial={'application': application})
-
-    context = {
+        form = InterviewScheduleForm(department=application.job.department)
+    
+    return render(request, 'hr/schedule_interview.html', {
         'form': form,
         'application': application,
-    }
-    return render(request, 'hr/schedule_interview.html', context)
+        'interviewers': interviewers
+    })
 
 # @login_required
 # def manage_interviews(request):
-#     if request.user.role not in ['hr', 'department']:
-#         messages.error(request, 'Only HR and departments can manage interviews.')
+#     user = request.user
+
+#     if user.role not in ['hr', 'department']:
+#         messages.error(request, 'Bạn không có quyền truy cập vào mục này.')
 #         return redirect('jobs:job_list')
-#     if request.user.role == 'hr':
+
+#     if user.role == 'hr':
 #         interviews = InterviewSchedule.objects.all()
-#     else:
-#         interviews = InterviewSchedule.objects.filter(created_by=request.user)
+#     else:  # department
+#         interviews = InterviewSchedule.objects.filter(application__job__department=user.department)
+
 #     return render(request, 'hr/manage_interviews.html', {'interviews': interviews})
 
 @login_required
 def manage_interviews(request):
-    user = request.user
-
-    if user.role not in ['hr', 'department']:
+    if request.user.role == 'hr':
+        interviews = InterviewSchedule.objects.all()
+    elif request.user.department:
+        interviews = InterviewSchedule.objects.filter(application__job__department=request.user.department)
+    else:
         messages.error(request, 'Bạn không có quyền truy cập vào mục này.')
         return redirect('jobs:job_list')
-
-    if user.role == 'hr':
-        interviews = InterviewSchedule.objects.all()
-    else:  # department
-        interviews = InterviewSchedule.objects.filter(application__job__department=user.department)
-
+    
     return render(request, 'hr/manage_interviews.html', {'interviews': interviews})
 
 def company_info(request):

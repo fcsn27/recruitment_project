@@ -9,18 +9,28 @@
         <thead>
             <tr>
                 <th>Vị trí</th>
+                <th>Phòng ban</th>
                 <th>Ứng viên</th>
                 <th>Người phỏng vấn</th>
                 <th>Thời gian phỏng vấn</th>
+                <th>Địa điểm</th>
             </tr>
         </thead>
         <tbody>
             {% for interview in interviews %}
             <tr>
                 <td>{{ interview.application.job.title }}</td>
-                <td>{{ interview.application.applicant.email }}</td>
-                <td>{{ interview.interviewer.email|default:"Chưa có người phỏng vấn" }}</td>
-                <td>{{ interview.scheduled_time }}</td>
+                <td>{{ interview.application.job.department }}</td>
+                <td>{{ interview.application.user.email }}</td>
+                <td>
+                    {% for interviewer in interview.interviewers.all %}
+                        {{ interviewer.email }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Chưa có người phỏng vấn
+                    {% endfor %}
+                </td>
+                <td>{{ interview.scheduled_time|date:"d/m/Y H:i" }}</td>
+                <td>{{ interview.location }}</td>
             </tr>
             {% endfor %}
         </tbody>
