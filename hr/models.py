@@ -19,9 +19,21 @@ class CompanyInfo(models.Model):
         verbose_name = "Thông tin doanh nghiệp"
         verbose_name_plural = "Thông tin doanh nghiệp"
 
+# class InterviewSchedule(models.Model):
+#     application = models.ForeignKey(Application, on_delete=models.CASCADE)
+#     interviewer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='interviews')
+#     scheduled_time = models.DateTimeField()
+#     location = models.CharField(max_length=255)
+#     notes = models.TextField(blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='created_interviews')
+
+#     def __str__(self):
+#         return f"Interview for {self.application.job.title} at {self.scheduled_time}"
+
 class InterviewSchedule(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    interviewer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='interviews')
+    interviewers = models.ManyToManyField(CustomUser, related_name='interviews')  # Thay đổi thành ManyToMany
     scheduled_time = models.DateTimeField()
     location = models.CharField(max_length=255)
     notes = models.TextField(blank=True)
@@ -29,7 +41,7 @@ class InterviewSchedule(models.Model):
     created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='created_interviews')
 
     def __str__(self):
-        return f"Interview for {self.application.job.title} at {self.scheduled_time}"
+        return f"Phỏng vấn cho {self.application.job.title} vào {self.scheduled_time}"
 
 class ActionLog(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='hr_action_logs')

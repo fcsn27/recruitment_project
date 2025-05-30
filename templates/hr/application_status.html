@@ -8,16 +8,25 @@
 <div class="card p-4">
   {% if applications %}
     <table class="table table-bordered">
+      <!-- <thead>
+        <tr>
+          <th>Vị trí</th>
+          <th>Ứng viên</th>
+          <th>Trạng thái</th>
+          {% if user.role == 'hr' %}
+            <th>Ghi chú</th>
+          {% endif %}
+        </tr>
+      </thead> -->
       <thead>
         <tr>
           <th>Vị trí</th>
-          {% if user.role != 'applicant' %}
+          {% if user.role == 'hr' %}
             <th>Ứng viên</th>
           {% endif %}
-          <th>CV</th>
           <th>Trạng thái</th>
           {% if user.role == 'hr' %}
-            <th>Hành động</th>
+            <th>Ghi chú</th>
           {% endif %}
         </tr>
       </thead>
@@ -25,19 +34,16 @@
         {% for app in applications %}
         <tr>
           <td>{{ app.job.title }}</td>
-          {% if user.role != 'applicant' %}
-          <td>{{ app.user.full_name }}</td>
+
+          {% if user.role == 'hr' %}
+            <td>{{ app.user.full_name }}</td>
           {% endif %}
-          <td>
-            {% if app.cv %}
-              <a href="{{ app.cv.url }}" target="_blank">Xem CV</a>
-            {% endif %}
-          </td>
+
           <td>
             {% if app.status == 'pending' %}
               <span class="badge bg-warning text-dark">Chờ duyệt</span>
             {% elif app.status == 'approved' %}
-              <span class="badge bg-info">Đã duyệt - Chuẩn bị phỏng vấn</span>
+              <span class="badge text-bg-primary">Đạt yêu cầu - Chuẩn bị phỏng vấn</span>
             {% elif app.status == 'passed' %}
               <span class="badge bg-success">Đạt tuyển</span>
             {% elif app.status == 'rejected' %}
@@ -48,20 +54,20 @@
           </td>
 
           {% if user.role == 'hr' %}
-          <td>
-            {% if app.status == 'approved' %}
-            <form method="post" action="{% url 'hr:update_application_status' app.id %}">
-              {% csrf_token %}
-              <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="approved" selected>Đã duyệt</option>
-                <option value="passed">Đạt tuyển</option>
-                <option value="rejected">Từ chối</option>
-              </select>
-            </form>
-            {% else %}
-              <span class="text-muted">Không thể thay đổi</span>
-            {% endif %}
-          </td>
+            <td>
+              {% if app.status == 'approved' %}
+                <form method="post" action="{% url 'hr:update_application_status' app.id %}">
+                  {% csrf_token %}
+                  <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="approved" selected>Chờ kết quả</option>
+                    <option value="passed">Đạt tuyển</option>
+                    <option value="rejected">Từ chối</option>
+                  </select>
+                </form>
+              {% else %}
+                <span class="text-muted">Đã ghi nhận</span>
+              {% endif %}
+            </td>
           {% endif %}
         </tr>
         {% endfor %}

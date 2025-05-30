@@ -16,7 +16,12 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'hr')
         return self.create_user(email, password, **extra_fields)
-
+DEPARTMENTS = [
+    ('IT', 'Công nghệ thông tin'),
+    ('HR', 'Nhân sự'),
+    ('Finance', 'Tài chính'),
+    ('Marketing', 'Marketing'),
+]
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('hr', 'HR'),
@@ -28,7 +33,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='applicant')
-    department = models.CharField(max_length=100, blank=True, help_text="Department or division within the company")
+    # department = models.CharField(max_length=100, blank=True, help_text="Department or division within the company")
+    department = models.CharField(max_length=100, choices=DEPARTMENTS, blank=True, default='', help_text="Phòng ban trong công ty")
     phone_number = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)

@@ -29,12 +29,32 @@ def apply_job(request, job_id):
         form = ApplicationForm()
     return render(request, 'jobs/apply_job.html', {'form': form, 'job': job})
 
+# @login_required
+# def application_status(request):
+#     if request.user.role != 'applicant':
+#         messages.error(request, 'Only applicants can view application status.')
+#         return redirect('jobs:job_list')
+#     applications = Application.objects.filter(user=request.user)
+#     return render(request, 'hr/application_status.html', {'applications': applications})
 @login_required
 def application_status(request):
-    if request.user.role != 'applicant':
-        messages.error(request, 'Only applicants can view application status.')
+    if request.user.role == 'applicant':
+        applications = Application.objects.filter(user=request.user)
+
+    elif request.user.role == 'department':
+        # Chỉ xem đơn thuộc phòng ban của họ và đã được HR duyệt (approved trở lên)
+        applications = Application.objects.filter(
+            job__department=request.user.role,
+            status__in=['approved', 'passed', 'rejected']  # hoặc status != 'pending'
+        )
+
+    elif request.user.role == 'hr':
+        applications = Application.objects.all()
+
+    else:
+        messages.error(request, 'Bạn không có quyền truy cập vào mục này.')
         return redirect('jobs:job_list')
-    applications = Application.objects.filter(user=request.user)
+    
     return render(request, 'hr/application_status.html', {'applications': applications})
 
 @login_required
@@ -58,7 +78,6 @@ def create_job_request(request):
         form = JobRequestForm()
     
     return render(request, 'jobs/create_job_request.html', {'form': form})
-
 
 @login_required
 def manage_job_requests(request):
