@@ -57,27 +57,8 @@ def user_management(request):
     if request.user.role != 'hr':
         messages.error(request, 'Chỉ nhân sự HR có thể quản lý người dùng.')
         return redirect('jobs:job_list')
-
     users = CustomUser.objects.all()
-
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            try:
-                user = form.save()
-                messages.success(request, f'Tài khoản {user.email} đã được tạo thành công.')
-                return redirect('accounts:user_management')
-            except IntegrityError:
-                messages.error(request, 'Email này đã được sử dụng.')
-        else:
-            messages.error(request, 'Vui lòng sửa các lỗi bên dưới.')
-    else:
-        form = CustomUserCreationForm()
-
-    return render(request, 'accounts/user_management.html', {
-        'users': users,
-        'form': form
-    })
+    return render(request, 'accounts/user_management.html', {'users': users})
 
 @login_required
 def edit_user(request, user_id):

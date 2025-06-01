@@ -66,10 +66,5 @@
             </table>
         </div>
     </div>
-    <div class="mt-3 text-center mb-5">
-        {% if user.role == 'department' %}
-            <a href="{% url 'jobs:create_job_request' %}" class="btn btn-primary">Tạo yêu cầu mới</a>
-        {% endif %}
-    </div>
 </div>
 {% endblock %}

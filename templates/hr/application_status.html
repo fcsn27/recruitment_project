@@ -7,24 +7,16 @@
 
 <div class="card p-4">
   {% if applications %}
-    <table class="table table-bordered">
-      <!-- <thead>
-        <tr>
-          <th>Vị trí</th>
-          <th>Ứng viên</th>
-          <th>Trạng thái</th>
-          {% if user.role == 'hr' %}
-            <th>Ghi chú</th>
-          {% endif %}
-        </tr>
-      </thead> -->
+    <table class="table">
       <thead>
         <tr>
           <th>Vị trí</th>
-          {% if user.role == 'hr' %}
+          {% if user.role == 'hr' or user.role == 'department' %}
             <th>Ứng viên</th>
           {% endif %}
           <th>Trạng thái</th>
+          <th>Thời gian phỏng vấn</th>
+          <th>Địa điểm</th>
           {% if user.role == 'hr' %}
             <th>Ghi chú</th>
           {% endif %}
@@ -35,7 +27,7 @@
         <tr>
           <td>{{ app.job.title }}</td>
 
-          {% if user.role == 'hr' %}
+          {% if user.role == 'hr' or user.role == 'department' %}
             <td>{{ app.user.full_name }}</td>
           {% endif %}
 
@@ -44,6 +36,8 @@
               <span class="badge bg-warning text-dark">Chờ duyệt</span>
             {% elif app.status == 'approved' %}
               <span class="badge text-bg-primary">Đạt yêu cầu - Chuẩn bị phỏng vấn</span>
+            {% elif app.status == 'scheduled' %}
+              <span class="badge bg-info">Đã lên lịch phỏng vấn</span>
             {% elif app.status == 'passed' %}
               <span class="badge bg-success">Đạt tuyển</span>
             {% elif app.status == 'rejected' %}
@@ -51,23 +45,71 @@
             {% else %}
               <span>{{ app.status }}</span>
             {% endif %}
+
+            {% if user.role == 'hr' and app.status == 'rejected' and app.rejection_reason %}
+              <br><small class="text-muted">Lý do: {{ app.rejection_reason }}</small>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if app.interview_schedule %}
+              {{ app.interview_schedule.scheduled_time|date:"d/m/Y H:i" }}
+            {% else %}
+              <span class="text-muted">Chưa có lịch</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if app.interview_schedule %}
+              {{ app.interview_schedule.location }}
+            {% else %}
+              <span class="text-muted">Chưa có địa điểm</span>
+            {% endif %}
           </td>
 
           {% if user.role == 'hr' %}
-            <td>
-              {% if app.status == 'approved' %}
-                <form method="post" action="{% url 'hr:update_application_status' app.id %}">
-                  {% csrf_token %}
-                  <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                    <option value="approved" selected>Chờ kết quả</option>
-                    <option value="passed">Đạt tuyển</option>
-                    <option value="rejected">Từ chối</option>
-                  </select>
-                </form>
-              {% else %}
-                <span class="text-muted">Đã ghi nhận</span>
-              {% endif %}
-            </td>
+          <td>
+            {% if app.status == 'pending' %}
+              <form method="post" action="{% url 'hr:update_application_status_inline' app.id %}" onsubmit="return confirm('Bạn có chắc muốn cập nhật trạng thái này?');">
+                {% csrf_token %}
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="pending" selected>Chờ duyệt</option>
+                  <option value="approved">Duyệt</option>
+                  <option value="rejected">Từ chối</option>
+                </select>
+                {% if app.status == 'rejected' %}
+                  <input type="text" name="rejection_reason" class="form-control form-control-sm mt-2" placeholder="Lý do từ chối">
+                {% endif %}
+              </form>
+
+            {% elif app.status == 'approved' %}
+              <form method="post" action="{% url 'hr:update_application_status' app.id %}" onsubmit="return confirm('Bạn có chắc muốn cập nhật trạng thái này?');">
+                {% csrf_token %}
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="approved" selected>Chờ kết quả</option>
+                  <option value="passed">Đạt tuyển</option>
+                  <option value="rejected">Từ chối</option>
+                </select>
+                {% if app.status == 'rejected' %}
+                  <input type="text" name="rejection_reason" class="form-control form-control-sm mt-2" placeholder="Lý do từ chối">
+                {% endif %}
+              </form>
+
+            {% elif app.status == 'scheduled' %}
+              <form method="post" action="{% url 'hr:update_application_status' app.id %}" onsubmit="return confirm('Bạn có chắc muốn cập nhật trạng thái này?');">
+                {% csrf_token %}
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="scheduled" selected>Đã lên lịch phỏng vấn</option>
+                  <option value="passed">Đạt tuyển</option>
+                  <option value="rejected">Từ chối</option>
+                </select>
+                <input type="text" name="rejection_reason" class="form-control form-control-sm mt-2" placeholder="Lý do từ chối (nếu có)">
+              </form>
+
+            {% else %}
+              <span class="text-muted">Đã ghi nhận</span>
+            {% endif %}
+          </td>
           {% endif %}
         </tr>
         {% endfor %}
