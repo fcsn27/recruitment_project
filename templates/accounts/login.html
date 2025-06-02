@@ -6,7 +6,9 @@
 <div class="card p-4">
     <form method="post" id="login-form">
         {% csrf_token %}
-        {% bootstrap_form form %}
+        {% for field in form %}
+            {% bootstrap_field field show_label=True %}
+        {% endfor %}
         {% bootstrap_button button_type="submit" content="Login" %}
     </form>
 
@@ -74,6 +76,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+    // Xử lý sự kiện khi có lỗi từ server
+    const inputs = form.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.classList.remove('is-invalid', 'is-valid');
+    });
 });
+
 </script>
 {% endblock %}
