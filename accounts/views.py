@@ -100,6 +100,25 @@ def register(request):
 #     })
 
 @login_required
+def add_user(request):
+    if request.user.role != 'hr':
+        messages.error(request, 'Chỉ nhân sự HR có thể thêm người dùng.')
+        return redirect('jobs:job_list')
+
+    if request.method == 'POST':
+        form = CustomUserCreationFormForHR(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'Tài khoản {user.email} đã được tạo.')
+            return redirect('accounts:user_management')
+        else:
+            messages.error(request, 'Vui lòng sửa lỗi bên dưới.')
+    else:
+        form = CustomUserCreationFormForHR()
+
+    return render(request, 'accounts/add_user.html', {'form': form})
+
+@login_required
 def user_management(request):
     if request.user.role != 'hr':
         messages.error(request, 'Chỉ nhân sự HR có thể quản lý người dùng.')

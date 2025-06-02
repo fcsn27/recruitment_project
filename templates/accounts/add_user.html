@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Thêm người dùng{% endblock %}
+{% block content %}
+<h2>Thêm người dùng</h2>
+<div class="card p-4">
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button button_type="submit" content="Tạo người dùng" %}
+    </form>
+    <a href="{% url 'accounts:user_management' %}" class="btn btn-secondary mt-3">Quay lại danh sách</a>
+</div>
+{% endblock %}

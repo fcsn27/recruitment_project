@@ -34,8 +34,8 @@
         </tbody>
     </table>
     {% else %}
-    <p>No users available.</p>
+        <p>No users available.</p>
     {% endif %}
-    <a href="{% url 'accounts:register' %}" class="btn btn-success">Add New User</a>
+    <a href="{% url 'accounts:add_user' %}" class="btn btn-success">Add New User</a>
 </div>
 {% endblock %}
