@@ -4,11 +4,76 @@
 {% block content %}
 <h2>Login</h2>
 <div class="card p-4">
-    <form method="post">
+    <form method="post" id="login-form">
         {% csrf_token %}
         {% bootstrap_form form %}
         {% bootstrap_button button_type="submit" content="Login" %}
     </form>
-    <p class="mt-3">Don't have an account? <a href="{% url 'accounts:register' %}">Register here</a>.</p>
+
+    <div class="mt-3">
+        <a href="{% url 'accounts:forgot_password' %}">Quên mật khẩu?</a>
+    </div>
 </div>
+
+<style>
+    /* Tạo khoảng trống bên phải cho input password để chứa icon */
+    input[type="password"] {
+        padding-right: 40px;
+        position: relative;
+    }
+
+    /* Wrapper position relative để icon position absolute bên trong */
+    .position-relative {
+        position: relative;
+    }
+
+    /* Style cho icon toggle */
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 18px;
+        user-select: none;
+        color: #666;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Tìm tất cả input password trong form login
+    const form = document.getElementById('login-form');
+    const passwordInputs = form.querySelectorAll('input[type="password"]');
+
+    passwordInputs.forEach(input => {
+        // Tạo wrapper div.position-relative bọc input
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('position-relative', 'mb-3');
+
+        // Thêm wrapper vào DOM thay thế input cũ
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+
+        // Thêm icon toggle vào wrapper
+        const toggle = document.createElement('span');
+        toggle.classList.add('toggle-password');
+        toggle.setAttribute('toggle', `#${input.id}`);
+        toggle.innerHTML = '&#128065;'; // icon mắt mở
+
+        wrapper.appendChild(toggle);
+
+        // Xử lý sự kiện click toggle
+        toggle.addEventListener('click', () => {
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.innerHTML = '&#128584;';  // biểu tượng che mắt
+            } else {
+                input.type = 'password';
+                toggle.innerHTML = '&#128065;';  // biểu tượng mắt mở
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

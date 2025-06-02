@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Xác minh OTP{% endblock %}
+{% block content %}
+<h2 class="text-center">Xác minh mã OTP</h2>
+<div class="card p-4">
+    <form method="post" id="otp-form">
+        {% csrf_token %}
+
+        <div class="mb-3 text-center">
+            <label class="form-label">Nhập mã OTP đã gửi đến email</label>
+            <div class="d-flex justify-content-center gap-2">
+                {% for i in "123456" %}
+                    <input type="text" maxlength="1" class="form-control text-center otp-input"
+                           style="width: 45px; font-size: 20px;" pattern="[0-9]*" inputmode="numeric">
+                {% endfor %}
+            </div>
+        </div>
+
+        <input type="hidden" name="otp" id="otp">
+
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-primary px-4">Xác minh</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const inputs = document.querySelectorAll(".otp-input");
+    const errorBoxGlobal = document.querySelector(".alert-danger");
+
+    inputs[0].focus();
+
+    inputs.forEach((input, index) => {
+        input.addEventListener("input", (e) => {
+            if (errorBoxGlobal) errorBoxGlobal.style.display = "none";
+            const value = e.target.value;
+            if (!/^[0-9]$/.test(value)) {
+                e.target.value = "";
+                return;
+            }
+            if (index < inputs.length - 1 && value !== "") {
+                inputs[index + 1].focus();
+            }
+        });
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && e.target.value === "" && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+    });
+
+    document.getElementById("otp-form").addEventListener("submit", function (e) {
+        const otp = Array.from(inputs).map(input => input.value).join('');
+        document.getElementById("otp").value = otp;
+    });
+</script>
+{% endblock %}

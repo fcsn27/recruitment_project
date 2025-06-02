@@ -85,7 +85,7 @@ def update_application_status(request, application_id):
         status = request.POST.get('status')
         rejection_reason = request.POST.get('rejection_reason', 'Không phù hợp với tiêu chí ứng tuyển')
 
-        if status not in ['pending', 'approved', 'rejected']:
+        if status not in ['pending', 'passed', 'rejected']:
             messages.error(request, 'Trạng thái không hợp lệ.')
             return redirect('hr:manage_applications')
 
@@ -269,7 +269,6 @@ def recruitment_requests_history(request):
 
 @login_required
 def update_application_status_inline(request, application_id):
-
     if request.user.role != 'hr':
         messages.error(request, 'Chỉ nhân sự mới được cập nhật trạng thái đơn ứng tuyển.')
         return redirect('hr:manage_applications')
@@ -280,11 +279,13 @@ def update_application_status_inline(request, application_id):
         status = request.POST.get('status')
         rejection_reason = request.POST.get('rejection_reason', 'Không phù hợp với tiêu chí ứng tuyển')
 
-        if application.status != 'pending':
-            messages.error(request, 'Chỉ có thể thay đổi trạng thái khi đơn đang ở trạng thái chờ duyệt.')
+        # Cho phép cập nhật từ trạng thái 'pending' hoặc 'scheduled'
+        if application.status not in ['pending', 'scheduled']:
+            messages.error(request, 'Chỉ có thể thay đổi trạng thái khi đơn đang ở trạng thái chờ duyệt hoặc đã lên lịch phỏng vấn.')
             return redirect('hr:manage_applications')
 
-        if status not in ['approved', 'pending', 'rejected']:
+        # Kiểm tra trạng thái hợp lệ
+        if status not in ['pending', 'approved', 'scheduled', 'passed', 'rejected']:
             messages.error(request, 'Trạng thái không hợp lệ.')
             return redirect('hr:manage_applications')
 
@@ -299,6 +300,20 @@ def update_application_status_inline(request, application_id):
             messages.success(request, 'Đơn ứng tuyển đã bị từ chối và thông báo đến ứng viên.')
             return redirect('hr:manage_applications')
 
+        if status == 'passed':
+            application.status = 'passed'
+            application.rejection_reason = None
+            application.save()
+
+            ActionLog.objects.create(
+                user=request.user,
+                action_type='approve_application',
+                details=f'Đơn ứng tuyển {application.id} đã đạt tuyển.',
+                timestamp=timezone.now()
+            )
+            messages.success(request, 'Đơn ứng tuyển đã đạt tuyển thành công.')
+            return redirect('hr:manage_applications')
+
         if status == 'approved':
             application.status = 'approved'
             application.rejection_reason = None
@@ -307,10 +322,27 @@ def update_application_status_inline(request, application_id):
             ActionLog.objects.create(
                 user=request.user,
                 action_type='approve_application',
-                details=f'Đơn ứng tuyển {application.id} đã được duyệt.',
+                details=f'Đơn ứng tuyển {application.id} đã được duyệt để phỏng vấn.',
                 timestamp=timezone.now()
             )
-            messages.success(request, 'Đơn ứng tuyển đã được duyệt thành công.')
+            messages.success(request, 'Đơn ứng tuyển đã được duyệt để phỏng vấn.')
+            return redirect('hr:manage_applications')
+
+        if status == 'scheduled':
+            # Nếu trạng thái là 'scheduled', cần kiểm tra xem đã có lịch phỏng vấn chưa
+            if not InterviewSchedule.objects.filter(application=application).exists():
+                messages.error(request, 'Không thể đặt trạng thái "Đã lên lịch phỏng vấn" khi chưa có lịch phỏng vấn.')
+                return redirect('hr:manage_applications')
+            application.status = 'scheduled'
+            application.save()
+
+            ActionLog.objects.create(
+                user=request.user,
+                action_type='update_application_status',
+                details=f'Đơn ứng tuyển {application.id} đã được cập nhật sang trạng thái đã lên lịch phỏng vấn.',
+                timestamp=timezone.now()
+            )
+            messages.success(request, 'Đơn ứng tuyển đã được cập nhật thành công.')
             return redirect('hr:manage_applications')
 
     return redirect('hr:manage_applications')

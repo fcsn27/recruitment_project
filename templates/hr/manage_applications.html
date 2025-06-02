@@ -12,7 +12,6 @@
         <th>Ứng viên</th>
         <th>CV</th>
         <th>Trạng thái</th>
-        <th>Hành động</th>
       </tr>
     </thead>
     <tbody>
@@ -32,20 +31,13 @@
             </select>
           </form>
           {% elif application.status == 'approved' %}
-            <span class="badge text-bg-info">Đã duyệt - Chuẩn bị phỏng vấn</span>
+            <span class="badge text-bg-primary fs-7">CHUẨN BỊ PHỎNG VẤN</span>
           {% elif application.status == 'passed' %}
-            <span class="badge text-bg-success">Đạt tuyển</span>
+            <span class="badge text-bg-success fs-7">ĐẠT</span>
           {% elif application.status == 'rejected' %}
-            <span class="badge text-bg-danger">Từ chối</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if application.status == 'pending' %}
-            <span class="text-muted">Chờ xét duyệt</span>
-          {% elif application.status == 'approved' %}
-            <a href="{% url 'hr:schedule_interview' application.id %}" class="btn btn-primary btn-sm">Quản lý phỏng vấn</a>
+            <span class="badge text-bg-danger fs-7">BỊ TỪ CHỐI</span>
           {% else %}
-            <span class="text-secondary">Đã ghi nhận</span>
+            <span class="badge text-bg-secondary fs-7">ĐÃ GHI NHẬN</span>
           {% endif %}
         </td>
       </tr>

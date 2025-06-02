@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+import datetime
+from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -16,7 +18,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'hr')
         return self.create_user(email, password, **extra_fields)
-
+    
 DEPARTMENTS = [
     ('IT', 'Công nghệ thông tin'),
     ('HR', 'Nhân sự'),
@@ -35,6 +37,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='applicant')
+    department = models.CharField(max_length=100, blank=True, help_text="Department or division within the company")
     department = models.CharField(max_length=100, choices=DEPARTMENTS, blank=True, default='', help_text="Phòng ban trong công ty")
     phone_number = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
@@ -49,3 +52,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class PasswordResetOTP(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        return timezone.now() - self.created_at < datetime.timedelta(minutes=5)
